@@ -48,9 +48,10 @@
 	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 	<script src="./document_check_logics/checkExtension.js"></script>
 	<script>
-
 		// ロードされ、Vueがグローバル変数として定義されているか確認
 		console.assert(typeof Vue !== 'undefined');
+		// ファイル不正メッセージ
+		const FILE_FORMAT_ERROR_MSG = "ファイルの拡張子が不正です。";
 		
 		new Vue({
 			el: '#app',
@@ -67,7 +68,7 @@
 					const fileName = document.getElementById("excelFile").files[0].name;
 					if (checkExtension(fileName) === false) {
 						// チェックメッセージ変更
-						vm.checkMessage = EXTENSION_ERROR_MESSAGE;
+						alert(FILE_FORMAT_ERROR_MSG);
 						return;
 					}
 
