@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<title>設計書お作法チェック</title>
+		<meta charset="UTF-8">
+		<meta name="author" content="susaki3540">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+		<style>
+			* {
+				font-family: 'Noto Sans JP', sans-serif;
+			}
+			h1.tool-title {
+				background-color: darkgreen;
+				color: white;
+				padding-left: 1em;
+			}
+			h2 {
+				background-color: lightgreen;
+				color: darkgreen;
+				padding-left: 1em;
+			}
+			table {
+				border-collapse: collapse;
+				border-style: solid;
+				border-color: darkgreen;
+			}
+			th,td {
+				padding: 0.5em;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<h1 class="tool-title">設計書お作法チェック</h1>
+			<h2>INPUT</h2>
+		<input type="file" id="excelFile" /><br>
+		<p>{{ checkMessage }}</p>
+		<button v-on:click="doFormat">整形</button>
+		</div>
+	</body>
+	<script src="https://unpkg.com/vue@2.5.17"></script>
+	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+	<script src="./document_check_logics/checkExtension.js"></script>
+	<script src="./document_check_logics/checkKinoGaiyoSheet.js"></script>
+	<script>
+		// チェック開始前メッセージ
+		const BEFORE_CHECK_MESSAGE = 'ファイルが未選択です。';
+		// チェック開始後メッセージ
+		const AFTER_CHECK_MESSAGE = 'チェックが完了しました。';
+		// 拡張子不正メッセージ
+		const EXTENSION_ERROR_MESSAGE = '拡張子が不正です。';
+
+		// ロードされ、Vueがグローバル変数として定義されているか確認
+		console.assert(typeof Vue !== 'undefined');
+		
+		new Vue({
+			el: '#app',
+			data: {
+				checkMessage: BEFORE_CHECK_MESSAGE,
+			},
+
+
+			methods: {
+				/**
+				 * 「チェック開始」ボタン押下時のイベント
+				*/
+				doFormat: function() {
+					const vm = this;
+					vm.errorList = [];
+
+					// 拡張子チェック
+					const fileName = document.getElementById("excelFile").files[0].name;
+					if (checkExtension(fileName) === false) {
+						// チェックメッセージ変更
+						vm.checkMessage = EXTENSION_ERROR_MESSAGE;
+						return;
+					}
+
+					vm.fileName = fileName;
+
+					// FileReader
+					let fileReader = new FileReader();
+					fileReader.onload = function (event) {
+						// ファイル内容取得
+						let uint8 = new Uint8Array(event.target.result);
+						let workBook = XLSX.read(uint8, {type: "array"});
+
+						// シート名一覧取得
+						const workSheetNames = Array.from(workBook.SheetNames);
+
+						// ファイル名をチェックして処理を実行
+						workSheetNames.forEach((workSheetName, index) => {
+							// アクティブセルを"A1"に移動
+							workBook.Sheets[workSheetName]['origin'] = "A1";
+						});
+
+						XLSX.writeFile(workBook, 'test.xlsx');
+						console.log(workBook);
+					}		
+
+					// ファイル読み込み
+					let file = document.getElementById("excelFile").files[0];
+					fileReader.readAsArrayBuffer(file);
+
+					// チェックメッセージ変更
+					vm.checkMessage = AFTER_CHECK_MESSAGE;
+
+
+				},
+
+
+				
+			}
+		});
+	</script>
+</html>
