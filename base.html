@@ -88,6 +88,7 @@
 						workSheetNames.forEach((workSheetName, index) => {
 							// アクティブセルを"A1"に移動
 							workBook.Sheets[workSheetName]['origin'] = "A1";
+							// 表示倍率を100%に変更
 							workBook.Sheets[workSheetName]['scale'] = 1;
 						});
 
