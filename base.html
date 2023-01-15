@@ -6,51 +6,48 @@
 		<meta name="author" content="susaki3540">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Roboto:ital,wght@1,300;1,700&display=swap" rel="stylesheet">
 		<style>
 			* {
-				font-family: 'Noto Sans JP', sans-serif;
+				font-family: 'Noto Sans JP', 'Roboto', sans-serif sans-serif;
+			}
+			body {
+				text-align: center;
 			}
 			h1.tool-title {
-				background-color: darkgreen;
+				background-color: darkblue;
 				color: white;
 				padding-left: 1em;
 			}
 			h2 {
-				background-color: lightgreen;
-				color: darkgreen;
+				background-color: lightblue;
+				color: darkblue;
 				padding-left: 1em;
 			}
-			table {
-				border-collapse: collapse;
-				border-style: solid;
-				border-color: darkgreen;
+			
+			button {
+				margin-top: 1em;
+				background-color: blue;
+				border-radius: 50px;
+				color: #fff;
+				padding: 15px 50px;
+				font-size: medium;
 			}
-			th,td {
-				padding: 0.5em;
-			}
+			
 		</style>
 	</head>
 	<body>
 		<div id="app">
-			<h1 class="tool-title">設計書お作法チェック</h1>
+			<h1 class="tool-title">設計書汎用整形ツール</h1>
 			<h2>INPUT</h2>
 		<input type="file" id="excelFile" /><br>
-		<p>{{ checkMessage }}</p>
 		<button v-on:click="doFormat">整形</button>
 		</div>
 	</body>
 	<script src="https://unpkg.com/vue@2.5.17"></script>
 	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 	<script src="./document_check_logics/checkExtension.js"></script>
-	<script src="./document_check_logics/checkKinoGaiyoSheet.js"></script>
 	<script>
-		// チェック開始前メッセージ
-		const BEFORE_CHECK_MESSAGE = 'ファイルが未選択です。';
-		// チェック開始後メッセージ
-		const AFTER_CHECK_MESSAGE = 'チェックが完了しました。';
-		// 拡張子不正メッセージ
-		const EXTENSION_ERROR_MESSAGE = '拡張子が不正です。';
 
 		// ロードされ、Vueがグローバル変数として定義されているか確認
 		console.assert(typeof Vue !== 'undefined');
@@ -94,10 +91,12 @@
 						workSheetNames.forEach((workSheetName, index) => {
 							// アクティブセルを"A1"に移動
 							workBook.Sheets[workSheetName]['origin'] = "A1";
+							workBook.Sheets[workSheetName]['scale'] = 1;
+							console.log(workBook.Sheets[workSheetName]);
 						});
 
 						XLSX.writeFile(workBook, 'test.xlsx');
-						console.log(workBook);
+						
 					}		
 
 					// ファイル読み込み
