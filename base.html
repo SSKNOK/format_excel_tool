@@ -54,10 +54,6 @@
 		
 		new Vue({
 			el: '#app',
-			data: {
-				checkMessage: BEFORE_CHECK_MESSAGE,
-			},
-
 
 			methods: {
 				/**
@@ -92,7 +88,6 @@
 							// アクティブセルを"A1"に移動
 							workBook.Sheets[workSheetName]['origin'] = "A1";
 							workBook.Sheets[workSheetName]['scale'] = 1;
-							console.log(workBook.Sheets[workSheetName]);
 						});
 
 						XLSX.writeFile(workBook, 'test.xlsx');
