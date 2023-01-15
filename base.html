@@ -1,114 +1,112 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<title>設計書お作法チェック</title>
-		<meta charset="UTF-8">
-		<meta name="author" content="susaki3540">
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Roboto:ital,wght@1,300;1,700&display=swap" rel="stylesheet">
-		<style>
-			* {
-				font-family: 'Noto Sans JP', 'Roboto', sans-serif sans-serif;
-			}
-			body {
-				text-align: center;
-			}
-			h1.tool-title {
-				background-color: darkblue;
-				color: white;
-				padding-left: 1em;
-			}
-			h2 {
-				background-color: lightblue;
-				color: darkblue;
-				padding-left: 1em;
-			}
-			
-			button {
-				margin-top: 1em;
-				background-color: blue;
-				border-radius: 50px;
-				color: #fff;
-				padding: 15px 50px;
-				font-size: medium;
-			}
-			
-		</style>
-	</head>
-	<body>
-		<div id="app">
-			<h1 class="tool-title">設計書汎用整形ツール</h1>
-			<h2>INPUT</h2>
+
+<head>
+	<title>設計書汎用整形ツール</title>
+	<meta charset="UTF-8">
+	<meta name="author" content="susaki3540">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Roboto:ital,wght@1,300;1,700&display=swap"
+		rel="stylesheet">
+	<style>
+		* {
+			font-family: 'Noto Sans JP', 'Roboto', sans-serif sans-serif;
+		}
+
+		body {
+			text-align: center;
+		}
+
+		h1.tool-title {
+			background-color: darkblue;
+			color: white;
+			padding-left: 1em;
+		}
+
+		h2 {
+			background-color: lightblue;
+			color: darkblue;
+			padding-left: 1em;
+		}
+
+		button {
+			margin-top: 1em;
+			background-color: blue;
+			border-radius: 50px;
+			color: #fff;
+			padding: 15px 50px;
+			font-size: medium;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app">
+		<h1 class="tool-title">設計書汎用整形ツール</h1>
+		<h2>INPUT</h2>
 		<input type="file" id="excelFile" /><br>
 		<button v-on:click="doFormat">整形</button>
-		</div>
-	</body>
-	<script src="https://unpkg.com/vue@2.5.17"></script>
-	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
-	<script src="./document_check_logics/checkExtension.js"></script>
-	<script>
-		// ロードされ、Vueがグローバル変数として定義されているか確認
-		console.assert(typeof Vue !== 'undefined');
-		// ファイル不正メッセージ
-		const FILE_FORMAT_ERROR_MSG = "ファイルの拡張子が不正です。";
-		
-		new Vue({
-			el: '#app',
+	</div>
+</body>
+<script src="https://unpkg.com/vue@2.5.17"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script src="./document_check_logics/checkExtension.js"></script>
+<script>
+	// ロードされ、Vueがグローバル変数として定義されているか確認
+	console.assert(typeof Vue !== 'undefined');
+	// ファイル不正メッセージ
+	const FILE_FORMAT_ERROR_MSG = "ファイルの拡張子が不正です。";
 
-			methods: {
-				/**
-				 * 「チェック開始」ボタン押下時のイベント
-				*/
-				doFormat: function() {
-					const vm = this;
-					vm.errorList = [];
+	new Vue({
+		el: '#app',
 
-					// 拡張子チェック
-					const fileName = document.getElementById("excelFile").files[0].name;
-					if (checkExtension(fileName) === false) {
-						// チェックメッセージ変更
-						alert(FILE_FORMAT_ERROR_MSG);
-						return;
-					}
+		methods: {
+			/**
+			 * 「チェック開始」ボタン押下時のイベント
+			*/
+			doFormat: function () {
+				const vm = this;
+				vm.errorList = [];
 
-					vm.fileName = fileName;
+				// 拡張子チェック
+				const fileName = document.getElementById("excelFile").files[0].name;
+				if (checkExtension(fileName) === false) {
+					alert(FILE_FORMAT_ERROR_MSG);
+					return;
+				}
 
-					// FileReader
-					let fileReader = new FileReader();
-					fileReader.onload = function (event) {
-						// ファイル内容取得
-						let uint8 = new Uint8Array(event.target.result);
-						let workBook = XLSX.read(uint8, {type: "array"});
+				vm.fileName = fileName;
 
-						// シート名一覧取得
-						const workSheetNames = Array.from(workBook.SheetNames);
+				// ファイル内容取得および整形の実処理部分
+				let fileReader = new FileReader();
+				fileReader.onload = function (event) {
+					// ファイル内容取得
+					let uint8 = new Uint8Array(event.target.result);
+					let workBook = XLSX.read(uint8, { type: "array" });
+					console.log(workBook);
 
-						// ファイル名をチェックして処理を実行
-						workSheetNames.forEach((workSheetName, index) => {
-							// アクティブセルを"A1"に移動
-							workBook.Sheets[workSheetName]['origin'] = "A1";
-							// 表示倍率を100%に変更
-							workBook.Sheets[workSheetName]['scale'] = 1;
-						});
+					// シート名一覧取得
+					const workSheetNames = Array.from(workBook.SheetNames);
+					// ファイル名をチェックして処理を実行
+					workSheetNames.forEach((workSheetName, index) => {
+						// アクティブセルを"A1"に移動
+						workBook.Sheets[workSheetName]['origin'] = "A1";
+						// 表示倍率を100%に変更
+						workBook.Sheets[workSheetName]['scale'] = 1;
+					});
+					
 
-						XLSX.writeFile(workBook, 'test.xlsx');
-						
-					}		
+					XLSX.writeFile(workBook, fileName);
 
-					// ファイル読み込み
-					let file = document.getElementById("excelFile").files[0];
-					fileReader.readAsArrayBuffer(file);
+				}
 
-					// チェックメッセージ変更
-					vm.checkMessage = AFTER_CHECK_MESSAGE;
+				// ファイル読み込み
+				let file = document.getElementById("excelFile").files[0];
+				fileReader.readAsArrayBuffer(file);
+			},
+		}
+	});
+</script>
 
-
-				},
-
-
-				
-			}
-		});
-	</script>
 </html>
